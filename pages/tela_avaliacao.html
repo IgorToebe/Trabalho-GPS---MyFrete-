@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação do Motorista - MyFrete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/login.css">
+    <link rel="stylesheet" href="../styles/avaliacao.css">
+    <script src="../scripts/avaliacao.js"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box avaliacao-box">
+            <img src="../images/logo_myfrete.png" alt="Logo MyFrete" class="logo">
+            <h3>Avalie o Motorista</h3>
+            <form id="avaliacaoForm">
+                <div class="input-group">
+                    <label for="nota">Nota</label>
+                    <select id="nota" name="nota" required>
+                        <option value="">Selecione</option>
+                        <option value="5">5 - Excelente</option>
+                        <option value="4">4 - Muito Bom</option>
+                        <option value="3">3 - Bom</option>
+                        <option value="2">2 - Regular</option>
+                        <option value="1">1 - Ruim</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="comentario">Comentário</label>
+                    <textarea id="comentario" name="comentario" rows="3"></textarea>
+                </div>
+                <button type="submit">Enviar Avaliação</button>
+            </form>
+            <div id="avaliacaoMsg"></div>
+            <p class="back-link"><a href="dashboard.html">Voltar para o Dashboard</a></p>
+        </div>
+    </div>
+</body>
+</html>

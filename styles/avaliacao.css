@@ -1,0 +1,10 @@
+/* Estilos específicos para avaliação */
+.avaliacao-box {
+    max-width: 500px;
+}
+#avaliacaoMsg {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #007bff;
+    display: none;
+}

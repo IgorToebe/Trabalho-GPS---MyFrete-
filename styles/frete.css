@@ -1,0 +1,21 @@
+/* Estilos específicos para tela de frete */
+.frete-box {
+    max-width: 500px;
+}
+.frete-detalhes {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 18px;
+    text-align: left;
+    font-size: 16px;
+}
+.frete-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+.frete-actions button {
+    min-width: 120px;
+}

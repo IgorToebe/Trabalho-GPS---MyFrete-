@@ -1,0 +1,14 @@
+/* Estilos específicos para pesquisa de frete */
+.pesquisa-box {
+    max-width: 500px;
+}
+#resultadoPesquisa {
+    margin-top: 24px;
+    padding: 16px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    min-height: 40px;
+    font-size: 16px;
+    color: #333;
+    display: none;
+}

@@ -1,0 +1,133 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('../moto_background.jpg') no-repeat center center fixed; /* Imagem de fundo */
+    background-size: cover;
+    color: #333;
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.95); /* Fundo branco semi-transparente */
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    backdrop-filter: blur(5px); /* Efeito de desfoque no fundo do container */
+}
+
+.moto {
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+.logo {
+    width: 320px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+p {
+    color: #666;
+    margin-bottom: 25px;
+    font-weight: 400;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #007bff; /* Cor azul para foco */
+    outline: none;
+}
+
+button {
+    background-color: #007bff; /* Azul vibrante */
+    color: white;
+    padding: 14px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.error-message {
+    color: #dc3545; /* Vermelho para mensagens de erro */
+    margin-top: 15px;
+    font-weight: 500;
+    display: none; /* Escondido por padrão */
+}
+
+.signup-link {
+    margin-top: 25px;
+    font-size: 15px;
+}
+
+.signup-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .login-container {
+        padding: 30px;
+        margin: 20px;
+    }
+
+    .logo {
+        width: 120px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    button {
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+}

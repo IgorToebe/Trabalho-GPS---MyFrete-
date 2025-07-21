@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MyFrete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="../scripts/login.js"></script>
+    <link rel="stylesheet" href="../styles/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <img src="../images/moto_background.png" alt="Moto Background" class="moto"></img>
+            <img src="../images/logo_myfrete.png" alt="Logo MyFrete" class="logo">
+            <h3>Bem-vindo ao MyFrete!</h3>
+            <p>Faça login para solicitar seus fretes urbanos via moto.</p>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Entrar</button>
+            </form>
+            <p class="error-message" id="errorMessage"></p>
+            <p class="signup-link">Não tem uma conta? <a href="#">Cadastre-se aqui</a></p>
+        </div>
+    </div>
+</body>
+</html>

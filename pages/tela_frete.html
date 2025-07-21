@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frete Atual - MyFrete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/login.css">
+    <link rel="stylesheet" href="../styles/frete.css">
+    <script src="../scripts/frete.js"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box frete-box">
+            <img src="../images/logo_myfrete.png" alt="Logo MyFrete" class="logo">
+            <h3>Detalhes do Frete</h3>
+            <div class="frete-detalhes">
+                <p><strong>Origem:</strong> <span id="origem">Av. Central, 100</span></p>
+                <p><strong>Destino:</strong> <span id="destino">Rua das Flores, 200</span></p>
+                <p><strong>Motorista:</strong> <span id="motorista">João Silva</span></p>
+                <p><strong>Status:</strong> <span id="status">A caminho para retirada</span></p>
+            </div>
+            <div class="frete-actions">
+                <button id="btnChat">Abrir Chat</button>
+                <button id="btnFinalizar">Finalizar Frete</button>
+            </div>
+            <p class="back-link"><a href="dashboard.html">Voltar para o Dashboard</a></p>
+        </div>
+    </div>
+</body>
+</html>
