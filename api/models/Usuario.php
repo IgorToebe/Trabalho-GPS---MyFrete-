@@ -24,6 +24,20 @@ class Usuario extends BaseModel {
         // Hash password
         $hashedPassword = password_hash($data['senha'], PASSWORD_DEFAULT);
         
+        if ($this->mockMode) {
+            // Use mock database
+            $userData = [
+                'nomecompleto' => trim($data['nomecompleto']),
+                'email' => trim($data['email']),
+                'telefone' => trim($data['telefone']),
+                'senha' => $hashedPassword,
+                'ehentregador' => isset($data['ehentregador']) ? (bool)$data['ehentregador'] : false
+            ];
+            
+            $id = MockDatabase::addUser($userData);
+            return $this->successResponse(['id_usu' => $id], "Usuário criado com sucesso");
+        }
+        
         try {
             $sql = "INSERT INTO login_usuarios (nomecompleto, email, telefone, senha, ehentregador) 
                     VALUES (:nomecompleto, :email, :telefone, :senha, :ehentregador) 
@@ -49,6 +63,18 @@ class Usuario extends BaseModel {
     public function authenticate($email, $senha) {
         if (empty($email) || empty($senha)) {
             $this->errorResponse("Email e senha são obrigatórios");
+        }
+        
+        if ($this->mockMode) {
+            $user = MockDatabase::findUserByEmail($email);
+            
+            if (!$user || !password_verify($senha, $user['senha'])) {
+                $this->errorResponse("Email ou senha incorretos", 401);
+            }
+            
+            // Remove password from response
+            unset($user['senha']);
+            return $this->successResponse($user, "Login realizado com sucesso");
         }
         
         try {
@@ -96,6 +122,15 @@ class Usuario extends BaseModel {
     }
     
     public function getEntregadores() {
+        if ($this->mockMode) {
+            $entregadores = array_values(MockDatabase::getEntregadores());
+            // Remove passwords
+            foreach ($entregadores as &$user) {
+                unset($user['senha']);
+            }
+            return $this->successResponse($entregadores);
+        }
+        
         try {
             $sql = "SELECT id_usu, nomecompleto, email, telefone, created_at 
                     FROM login_usuarios WHERE ehentregador = TRUE ORDER BY nomecompleto";
@@ -113,6 +148,10 @@ class Usuario extends BaseModel {
     }
     
     private function emailExists($email) {
+        if ($this->mockMode) {
+            return MockDatabase::findUserByEmail($email) !== null;
+        }
+        
         $sql = "SELECT COUNT(*) FROM login_usuarios WHERE email = :email";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':email' => $email]);

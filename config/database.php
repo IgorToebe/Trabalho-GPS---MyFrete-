@@ -40,10 +40,21 @@ class Database {
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ]);
             } catch (PDOException $e) {
-                throw new Exception("Database connection failed: " . $e->getMessage());
+                // For development/demo purposes, fall back to mock database
+                require_once __DIR__ . '/mock_database.php';
+                throw new Exception("Database connection failed (using mock data for demo): " . $e->getMessage());
             }
         }
         return $this->pdo;
+    }
+
+    public function isMockMode() {
+        try {
+            $this->getConnection();
+            return false;
+        } catch (Exception $e) {
+            return true;
+        }
     }
 }
 ?>

@@ -16,6 +16,19 @@ class Frete extends BaseModel {
             $this->errorResponse("Hora inválida. Use o formato HH:MM:SS");
         }
         
+        if ($this->mockMode) {
+            $freteData = [
+                'id_cliente' => $data['id_cliente'],
+                'data' => $data['data'],
+                'hora' => $data['hora'],
+                'end_origem' => trim($data['end_origem']),
+                'end_destino' => trim($data['end_destino'])
+            ];
+            
+            $id = MockDatabase::addFrete($freteData);
+            return $this->successResponse(['id_frete' => $id], "Frete criado com sucesso");
+        }
+        
         try {
             $sql = "INSERT INTO frete (id_cliente, data, hora, end_origem, end_destino, status) 
                     VALUES (:id_cliente, :data, :hora, :end_origem, :end_destino, 'pendente') 

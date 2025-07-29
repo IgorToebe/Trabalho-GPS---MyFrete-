@@ -1,13 +1,20 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 class BaseModel {
     protected $db;
     protected $pdo;
+    protected $mockMode = false;
 
     public function __construct() {
         $this->db = new Database();
-        $this->pdo = $this->db->getConnection();
+        try {
+            $this->pdo = $this->db->getConnection();
+            $this->mockMode = false;
+        } catch (Exception $e) {
+            $this->mockMode = true;
+            require_once __DIR__ . '/../../config/mock_database.php';
+        }
     }
 
     protected function jsonResponse($data, $status = 200) {
