@@ -46,8 +46,8 @@ CREATE INDEX IF NOT EXISTS idx_usuarios_entregador ON login_usuarios(ehentregado
 
 -- Insert some sample data for testing
 INSERT INTO login_usuarios (nomecompleto, email, telefone, senha, ehentregador) VALUES
-('João Silva', 'joao@example.com', '11987654321', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', TRUE),
-('Maria Santos', 'maria@example.com', '11987654322', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', TRUE),
-('Pedro Costa', 'pedro@example.com', '11987654323', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', FALSE),
-('Admin User', 'teste@myfrete.com', '11987654324', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', FALSE)
+('João Silva', 'joao@example.com', '11987654321', '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', TRUE),
+('Maria Santos', 'maria@example.com', '11987654322', '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', TRUE),
+('Pedro Costa', 'pedro@example.com', '11987654323', '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', FALSE),
+('Admin User', 'teste@myfrete.com', '11987654324', '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', FALSE)
 ON CONFLICT (email) DO NOTHING;

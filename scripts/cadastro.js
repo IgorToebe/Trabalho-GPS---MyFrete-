@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('cadastroForm');
     const errorMessage = document.getElementById('errorMessage');
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         errorMessage.style.display = 'none';
         errorMessage.textContent = '';
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const telefone = document.getElementById('telefone').value.trim();
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
+        const ehentregador = document.getElementById('ehentregador').checked;
 
         if (!nome || !email || !telefone || !password || !confirmPassword) {
             errorMessage.textContent = 'Por favor, preencha todos os campos.';
@@ -29,7 +30,34 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         // Aqui você pode adicionar a lógica de cadastro (ex: enviar para backend)
-        alert('Cadastro realizado com sucesso!');
-        window.location.href = 'tela_login.html';
+        try {
+            const response = await fetch('/api/login_usuarios', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nomecompleto: nome,
+                    email: email,
+                    telefone: telefone,
+                    senha: password,
+                    ehentregador: ehentregador
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert('Cadastro realizado com sucesso!');
+                window.location.href = 'tela_login.html';
+            } else {
+                errorMessage.textContent = result.error || 'Erro no cadastro. Tente novamente.';
+                errorMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            errorMessage.textContent = 'Erro de conexão. Tente novamente.';
+            errorMessage.style.display = 'block';
+        }
     });
 });
