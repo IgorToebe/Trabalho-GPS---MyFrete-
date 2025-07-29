@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in
+    const userData = localStorage.getItem('userData');
+    if (!userData) {
+        window.location.href = 'tela_login.html';
+        return;
+    }
+
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
