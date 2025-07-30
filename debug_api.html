@@ -20,6 +20,7 @@
         <button onclick="testSimplePHP()">🧩 Testar PHP Básico</button>
         <button onclick="testAPIDebug()">🔍 Debug API Direto</button>
         <button onclick="testAPI()">🧪 Testar API Geral</button>
+        <button onclick="testEnvironment()">🌍 Variáveis de Ambiente</button>
         <button onclick="testFreteUpdate()">📦 Testar Frete Update</button>
         <button onclick="checkServerHealth()">🏥 Health Check</button>
         <button onclick="testDatabase()">🗄️ Testar Conexão BD</button>
@@ -170,6 +171,30 @@
                 
             } catch (error) {
                 addResult('💥 API Test Error', error.message, true);
+            }
+        }
+        
+        async function testEnvironment() {
+            try {
+                const response = await fetch('/api/debug/env', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                const contentType = response.headers.get('content-type') || 'unknown';
+                
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    addResult('❌ Environment Test Retornou HTML/Erro', 
+                        `Status: ${response.status}\nContent-Type: ${contentType}\n\nConteúdo:\n${text}`, true);
+                    return;
+                }
+                
+                const result = await response.json();
+                addResult('🌍 Environment Variables Debug', JSON.stringify(result, null, 2));
+                
+            } catch (error) {
+                addResult('💥 Environment Test Error', error.message, true);
             }
         }
 

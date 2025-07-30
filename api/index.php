@@ -73,6 +73,19 @@ try {
         exit;
     }
     
+    // Debug environment endpoint
+    if ($path === '/api/debug/env') {
+        $database = new Database();
+        $envDebug = $database->debugEnvironment();
+        echo json_encode([
+            'success' => true,
+            'message' => 'Environment Variables Debug',
+            'environment' => $envDebug,
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+        exit;
+    }
+    
     // Route to appropriate controller
     if (strpos($path, '/api/login_usuarios') === 0 || $path === '/api/login') {
         error_log("Routing to UsuarioController");
