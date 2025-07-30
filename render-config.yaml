@@ -1,0 +1,22 @@
+# render.yaml - Configuração para Render
+services:
+  - type: web
+    name: myfrete-app
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: virginia
+    plan: free
+    healthCheckPath: /simple_test.php
+    envVars:
+      - key: DB_HOST
+        value: dpg-d1sjc3re5dus73b3pre0-a.virginia-postgres.render.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: sbt_bd
+      - key: DB_USER
+        value: sebodetraca
+      - key: DB_PASS
+        value: Ye4TSEiib3f5WWoUOJILs9gKKlclqu1g
+      - key: APP_ENV
+        value: production

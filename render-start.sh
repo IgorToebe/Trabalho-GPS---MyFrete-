@@ -1,33 +1,26 @@
 #!/bin/bash
 set -e
 
-echo "Starting MyFrete application on Render..."
+echo "=== Starting MyFrete application on Render ==="
 
-# For Render, environment variables are automatically available
-echo "Database Host: $DB_HOST"
-echo "Database Port: $DB_PORT"
-echo "Database Name: $DB_NAME"
-echo "Database User: $DB_USER"
+# Log environment variables (without password)
+echo "Database Host: ${DB_HOST:-'not set'}"
+echo "Database Port: ${DB_PORT:-'not set'}"
+echo "Database Name: ${DB_NAME:-'not set'}"
+echo "Database User: ${DB_USER:-'not set'}"
+echo "Database Pass: ${DB_PASS:+'[SET]'}"
 
-# Test database connectivity (optional - don't fail if not available)
-if command -v pg_isready >/dev/null 2>&1; then
-    echo "Testing database connection..."
-    if pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" 2>/dev/null; then
-        echo "Database is available"
-        
-        # Initialize database if needed
-        if [ -f /var/www/html/database.sql ]; then
-            echo "Initializing database schema..."
-            PGPASSWORD="$DB_PASS" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -f /var/www/html/database.sql -v ON_ERROR_STOP=1 || echo "Database already initialized"
-        fi
-    else
-        echo "Database not immediately available, application will handle connection"
-    fi
-else
-    echo "pg_isready not available, skipping database test"
+# Skip database initialization for now to avoid 502 errors
+echo "Skipping database initialization to prevent startup issues..."
+
+# Set proper permissions (if needed)
+if [ -d "/var/www/html" ]; then
+    echo "Setting file permissions..."
+    chown -R www-data:www-data /var/www/html || echo "Could not change ownership"
+    chmod -R 755 /var/www/html || echo "Could not change permissions"
 fi
 
-# Set proper permissions
+echo "Starting Apache server..."
 chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
