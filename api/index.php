@@ -53,52 +53,17 @@ try {
     if (empty($data) && in_array($method, ['POST', 'PUT'])) {
         $data = $_POST;
     }
-
-    // Debug logging
-    error_log("Processed path: $path");
-    error_log("Data received: " . json_encode($data));
-    
-    // Test endpoint
-    if ($path === '/api/test') {
-        echo json_encode([
-            'success' => true,
-            'message' => 'API Router está funcionando!',
-            'method' => $method,
-            'path' => $path,
-            'uri' => $requestUri,
-            'data' => $data,
-            'queryParams' => $queryParams,
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        exit;
-    }
-    
-    // Debug environment endpoint
-    if ($path === '/api/debug/env') {
-        $database = new Database();
-        $envDebug = $database->debugEnvironment();
-        echo json_encode([
-            'success' => true,
-            'message' => 'Environment Variables Debug',
-            'environment' => $envDebug,
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        exit;
-    }
     
     // Route to appropriate controller
     if (strpos($path, '/api/login_usuarios') === 0 || $path === '/api/login') {
-        error_log("Routing to UsuarioController");
         $controller = new UsuarioController();
         $controller->handleRequest($method, $path, $data);
         
     } elseif (strpos($path, '/api/frete_avaliacao') === 0) {
-        error_log("Routing to FreteAvaliacaoController");
         $controller = new FreteAvaliacaoController();
         $controller->handleRequest($method, $path, $data, $queryParams);
         
     } elseif (strpos($path, '/api/frete') === 0) {
-        error_log("Routing to FreteController");
         $controller = new FreteController();
         $controller->handleRequest($method, $path, $data, $queryParams);
         

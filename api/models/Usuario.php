@@ -3,10 +3,7 @@ require_once 'BaseModel.php';
 
 class Usuario extends BaseModel {
     
-    /**
-     * Safe boolean conversion for PostgreSQL
-     * Handles empty strings, null values, and various string representations
-     */
+    // Safe boolean conversion for PostgreSQL
     private function safeBooleanConversion($value) {
         if (is_bool($value)) {
             return $value;
@@ -69,11 +66,6 @@ class Usuario extends BaseModel {
                 ':senha' => $hashedPassword,
                 ':ehentregador' => $ehentregador
             ];
-            
-            // Debug logging
-            error_log("SQL Parameters: " . json_encode($params));
-            error_log("ehentregador value: " . var_export($ehentregador, true));
-            error_log("ehentregador type: " . gettype($ehentregador));
             
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);

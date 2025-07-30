@@ -87,26 +87,5 @@ class RenderConfig {
         putenv("DB_PASS=" . $_ENV['DB_PASS']);
     }
     
-    public static function getDebugInfo() {
-        return [
-            'environment_source' => self::loadEnvironment(),
-            'variables' => [
-                'DB_HOST' => $_ENV['DB_HOST'] ?? 'not set',
-                'DB_PORT' => $_ENV['DB_PORT'] ?? 'not set',
-                'DB_NAME' => $_ENV['DB_NAME'] ?? 'not set',
-                'DB_USER' => $_ENV['DB_USER'] ?? 'not set',
-                'DB_PASS' => isset($_ENV['DB_PASS']) ? '***set***' : 'not set'
-            ],
-            'server_env' => [
-                'DATABASE_URL' => getenv('DATABASE_URL') ? 'set' : 'not set',
-                'DB_HOST' => getenv('DB_HOST') ?: 'not set',
-                'RENDER' => getenv('RENDER') ?: 'not set'
-            ],
-            'files' => [
-                'env_exists' => file_exists(__DIR__ . '/../.env') ? 'yes' : 'no',
-                'env_readable' => is_readable(__DIR__ . '/../.env') ? 'yes' : 'no'
-            ]
-        ];
-    }
 }
 ?>

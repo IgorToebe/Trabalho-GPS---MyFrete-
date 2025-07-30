@@ -19,10 +19,7 @@ class Database {
     }
 
     private function loadEnv() {
-        // Use the enhanced Render configuration
-        $source = RenderConfig::loadEnvironment();
-        error_log("Environment loaded from: $source");
-        error_log("Environment loaded from: $source");
+        RenderConfig::loadEnvironment();
     }
 
     public function getConnection() {
@@ -35,42 +32,22 @@ class Database {
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
-                    PDO::ATTR_TIMEOUT => 30, // Increased timeout for cloud connections
-                    PDO::ATTR_PERSISTENT => false, // Disable persistent connections for cloud
+                    PDO::ATTR_TIMEOUT => 30,
+                    PDO::ATTR_PERSISTENT => false,
                 ];
                 
-                error_log("Attempting database connection to: {$this->host}:{$this->port}");
-                error_log("Database: {$this->dbname}, User: {$this->username}");
-                
                 $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
-                
-                // Test connection
                 $this->pdo->query('SELECT 1');
                 
-                error_log("Database connection successful");
-                
             } catch (PDOException $e) {
-                error_log("Database connection failed: " . $e->getMessage());
-                error_log("DSN: pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}");
-                error_log("Environment Variables Debug: DB_HOST=" . ($_ENV['DB_HOST'] ?? 'not set') . 
-                         ", DB_PORT=" . ($_ENV['DB_PORT'] ?? 'not set') . 
-                         ", DB_NAME=" . ($_ENV['DB_NAME'] ?? 'not set') . 
-                         ", DB_USER=" . ($_ENV['DB_USER'] ?? 'not set'));
-                
                 // For development/demo purposes, fall back to mock database
                 if (file_exists(__DIR__ . '/mock_database.php')) {
                     require_once __DIR__ . '/mock_database.php';
-                    error_log("Using mock database for demo purposes");
                 }
                 throw new Exception("Database connection failed: " . $e->getMessage());
             }
         }
         return $this->pdo;
-    }
-    
-    // Debug method to check environment variables
-    public function debugEnvironment() {
-        return RenderConfig::getDebugInfo();
     }
 
     public function isMockMode() {
