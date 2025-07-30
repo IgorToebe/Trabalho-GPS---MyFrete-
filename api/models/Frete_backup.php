@@ -123,8 +123,12 @@ class Frete extends BaseModel {
     }
     
     public function update($id, $data) {
+        error_log("Frete::update called with id=$id, data=" . json_encode($data));
+        
         // Check if we're in mock mode first
         if ($this->mockMode) {
+            error_log("Using mock mode for frete update");
+            // Simple mock update - just return success
             return $this->successResponse(['id_frete' => $id], "Frete atualizado com sucesso (mock)");
         }
         
@@ -135,7 +139,10 @@ class Frete extends BaseModel {
             $checkStmt->execute([':id' => $id]);
             $frete = $checkStmt->fetch();
             
+            error_log("Frete check result: " . json_encode($frete));
+            
             if (!$frete) {
+                error_log("Frete not found with id=$id");
                 $this->errorResponse("Frete não encontrado", 404);
             }
             
@@ -146,17 +153,20 @@ class Frete extends BaseModel {
             if (isset($data['id_fretista'])) {
                 $updateFields[] = "id_fretista = :id_fretista";
                 $params[':id_fretista'] = $data['id_fretista'];
+                error_log("Adding id_fretista to update: " . $data['id_fretista']);
             }
             
             if (isset($data['status'])) {
                 // Validate status transitions
                 $validStatuses = ['pendente', 'aceito', 'em andamento', 'concluido', 'cancelado'];
                 if (!in_array($data['status'], $validStatuses)) {
+                    error_log("Invalid status: " . $data['status']);
                     $this->errorResponse("Status inválido");
                 }
                 
                 $updateFields[] = "status = :status";
                 $params[':status'] = $data['status'];
+                error_log("Adding status to update: " . $data['status']);
             }
             
             if (isset($data['end_origem'])) {
@@ -186,20 +196,30 @@ class Frete extends BaseModel {
             }
             
             if (empty($updateFields)) {
+                error_log("No fields to update");
                 $this->errorResponse("Nenhum campo para atualizar");
             }
             
             $updateFields[] = "updated_at = CURRENT_TIMESTAMP";
             
             $sql = "UPDATE frete SET " . implode(", ", $updateFields) . " WHERE id_frete = :id";
+            error_log("Update SQL: $sql");
+            error_log("Update params: " . json_encode($params));
             
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
+            $result = $stmt->execute($params);
+            
+            error_log("Update result: " . ($result ? 'success' : 'failed"));
+            error_log("Rows affected: " . $stmt->rowCount());
             
             return $this->successResponse(['id_frete' => $id], "Frete atualizado com sucesso");
             
         } catch (PDOException $e) {
+            error_log("PDO Exception in update: " . $e->getMessage());
             $this->errorResponse("Erro ao atualizar frete: " . $e->getMessage(), 500);
+        } catch (Exception $e) {
+            error_log("General Exception in update: " . $e->getMessage());
+            $this->errorResponse("Erro interno: " . $e->getMessage(), 500);
         }
     }
     
