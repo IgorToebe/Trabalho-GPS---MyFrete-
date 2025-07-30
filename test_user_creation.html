@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Cadastro de Usuário</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #0056b3; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        input, select { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Cadastro de Usuário</h1>
+    
+    <div class="test-section">
+        <h3>📝 Formulário de Teste</h3>
+        <form id="userForm">
+            <input type="text" id="nomecompleto" placeholder="Nome Completo" value="João Silva Test">
+            <input type="email" id="email" placeholder="Email" value="joao.test@exemplo.com">
+            <input type="tel" id="telefone" placeholder="Telefone" value="11999887766">
+            <input type="password" id="senha" placeholder="Senha (min 8 caracteres)" value="12345678">
+            <select id="ehentregador">
+                <option value="">Tipo de Usuário</option>
+                <option value="false">Cliente</option>
+                <option value="true">Entregador</option>
+            </select>
+            <button type="button" onclick="testUserCreation()">🚀 Criar Usuário</button>
+        </form>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 Testes Automáticos</h3>
+        <button onclick="testEmptyBoolean()">🔍 Testar Boolean Vazio</button>
+        <button onclick="testVariousBooleans()">🔢 Testar Vários Tipos Boolean</button>
+        <button onclick="testDuplicateEmail()">📧 Testar Email Duplicado</button>
+        <button onclick="clearResults()">🧹 Limpar Resultados</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function addResult(title, content, isError = false) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'result ' + (isError ? 'error' : 'success');
+            div.innerHTML = `<h4>${title}</h4><pre>${content}</pre>`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function createUser(userData) {
+            try {
+                const response = await fetch('/api/login_usuarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const contentType = response.headers.get('content-type') || 'unknown';
+                
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    addResult('❌ API Retornou HTML/Erro', 
+                        `Status: ${response.status}\nContent-Type: ${contentType}\n\nConteúdo:\n${text}`, true);
+                    return null;
+                }
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    addResult('✅ Usuário Criado', JSON.stringify(result, null, 2));
+                } else {
+                    addResult('❌ Erro na Criação', JSON.stringify(result, null, 2), true);
+                }
+                
+                return result;
+                
+            } catch (error) {
+                addResult('💥 Erro de Conexão', error.message, true);
+                return null;
+            }
+        }
+
+        async function testUserCreation() {
+            const userData = {
+                nomecompleto: document.getElementById('nomecompleto').value,
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('telefone').value,
+                senha: document.getElementById('senha').value,
+                ehentregador: document.getElementById('ehentregador').value
+            };
+
+            addResult('📤 Dados Enviados', JSON.stringify(userData, null, 2));
+            await createUser(userData);
+        }
+
+        async function testEmptyBoolean() {
+            const userData = {
+                nomecompleto: "Teste Boolean Vazio",
+                email: "boolean.vazio@test.com",
+                telefone: "11888777666",
+                senha: "12345678",
+                ehentregador: "" // Valor vazio que causava o erro
+            };
+
+            addResult('🔍 Testando Boolean Vazio', 'ehentregador: "" (string vazia)');
+            await createUser(userData);
+        }
+
+        async function testVariousBooleans() {
+            const testCases = [
+                { ehentregador: true, desc: "true (boolean)" },
+                { ehentregador: false, desc: "false (boolean)" },
+                { ehentregador: "true", desc: '"true" (string)' },
+                { ehentregador: "false", desc: '"false" (string)' },
+                { ehentregador: "1", desc: '"1" (string)' },
+                { ehentregador: "0", desc: '"0" (string)' },
+                { ehentregador: 1, desc: "1 (number)" },
+                { ehentregador: 0, desc: "0 (number)" }
+            ];
+
+            for (let i = 0; i < testCases.length; i++) {
+                const testCase = testCases[i];
+                const userData = {
+                    nomecompleto: `Teste Boolean ${i + 1}`,
+                    email: `boolean${i + 1}@test.com`,
+                    telefone: `1188877766${i}`,
+                    senha: "12345678",
+                    ehentregador: testCase.ehentregador
+                };
+
+                addResult(`🔢 Testando: ${testCase.desc}`, JSON.stringify({ ehentregador: testCase.ehentregador }, null, 2));
+                await createUser(userData);
+                
+                // Pequena pausa entre testes
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        async function testDuplicateEmail() {
+            const userData = {
+                nomecompleto: "João Silva Duplicado",
+                email: "joao.test@exemplo.com", // Mesmo email do primeiro teste
+                telefone: "11999887766",
+                senha: "12345678",
+                ehentregador: false
+            };
+
+            addResult('📧 Testando Email Duplicado', 'Usando email já cadastrado');
+            await createUser(userData);
+        }
+
+        // Teste automático ao carregar a página
+        window.onload = function() {
+            addResult('🏁 Página Carregada', 'Pronto para testes de cadastro de usuário');
+        };
+    </script>
+</body>
+</html>

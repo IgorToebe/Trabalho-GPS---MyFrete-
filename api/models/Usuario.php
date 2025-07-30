@@ -3,6 +3,22 @@ require_once 'BaseModel.php';
 
 class Usuario extends BaseModel {
     
+    /**
+     * Safe boolean conversion for PostgreSQL
+     * Handles empty strings, null values, and various string representations
+     */
+    private function safeBooleanConversion($value) {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_string($value)) {
+            $value = trim($value);
+            if ($value === '') return false;
+            return in_array(strtolower($value), ['true', '1', 'yes', 'on']);
+        }
+        return (bool)$value;
+    }
+    
     public function create($data) {
         $this->validateRequired($data, ['nomecompleto', 'email', 'telefone', 'senha']);
         
@@ -24,6 +40,9 @@ class Usuario extends BaseModel {
         // Hash password
         $hashedPassword = password_hash($data['senha'], PASSWORD_DEFAULT);
         
+        // Safe boolean conversion for PostgreSQL
+        $ehentregador = $this->safeBooleanConversion($data['ehentregador'] ?? false);
+        
         if ($this->mockMode) {
             // Use mock database
             $userData = [
@@ -31,7 +50,7 @@ class Usuario extends BaseModel {
                 'email' => trim($data['email']),
                 'telefone' => trim($data['telefone']),
                 'senha' => $hashedPassword,
-                'ehentregador' => isset($data['ehentregador']) ? (bool)$data['ehentregador'] : false
+                'ehentregador' => $ehentregador
             ];
             
             $id = MockDatabase::addUser($userData);
@@ -49,7 +68,7 @@ class Usuario extends BaseModel {
                 ':email' => trim($data['email']),
                 ':telefone' => trim($data['telefone']),
                 ':senha' => $hashedPassword,
-                ':ehentregador' => isset($data['ehentregador']) ? (bool)$data['ehentregador'] : false
+                ':ehentregador' => $ehentregador
             ]);
             
             $result = $stmt->fetch();
