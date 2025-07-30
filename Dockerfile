@@ -20,8 +20,8 @@ RUN a2enmod rewrite headers
 # Copy application files
 COPY . /var/www/html/
 
-# Make entrypoint script executable
-RUN chmod +x /var/www/html/docker-entrypoint.sh
+# Make both entrypoint scripts executable
+RUN chmod +x /var/www/html/docker-entrypoint.sh /var/www/html/render-start.sh
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
@@ -64,5 +64,5 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/health_check.php || exit 1
 
-# Use entrypoint script
-ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
+# Use render-start.sh for Render, docker-entrypoint.sh for Docker
+ENTRYPOINT ["/var/www/html/render-start.sh"]

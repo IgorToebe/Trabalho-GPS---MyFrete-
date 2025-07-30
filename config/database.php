@@ -17,6 +17,17 @@ class Database {
     }
 
     private function loadEnv() {
+        // First, try to load from environment variables (Render sets these automatically)
+        if (getenv('DB_HOST')) {
+            $_ENV['DB_HOST'] = getenv('DB_HOST');
+            $_ENV['DB_PORT'] = getenv('DB_PORT');
+            $_ENV['DB_NAME'] = getenv('DB_NAME');
+            $_ENV['DB_USER'] = getenv('DB_USER');
+            $_ENV['DB_PASS'] = getenv('DB_PASS');
+            return;
+        }
+
+        // Fallback to .env file for local development
         $envFile = __DIR__ . '/../.env';
         if (file_exists($envFile)) {
             $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -33,20 +44,26 @@ class Database {
     public function getConnection() {
         if ($this->pdo === null) {
             try {
-                $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}";
+                $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname};sslmode=require";
                 
-                // Add connection timeout for Docker environments
+                // Connection options optimized for cloud databases
                 $options = [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
-                    PDO::ATTR_TIMEOUT => 10, // 10 second timeout
+                    PDO::ATTR_TIMEOUT => 30, // Increased timeout for cloud connections
+                    PDO::ATTR_PERSISTENT => false, // Disable persistent connections for cloud
                 ];
+                
+                error_log("Attempting database connection to: {$this->host}:{$this->port}");
+                error_log("Database: {$this->dbname}, User: {$this->username}");
                 
                 $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
                 
                 // Test connection
                 $this->pdo->query('SELECT 1');
+                
+                error_log("Database connection successful");
                 
             } catch (PDOException $e) {
                 error_log("Database connection failed: " . $e->getMessage());

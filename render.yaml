@@ -1,0 +1,21 @@
+# Render.com Configuration File
+# This file is used by Render to configure the web service
+
+# Build Command
+# docker build -t myfrete .
+
+# Start Command
+# ./render-start.sh
+
+# Environment Variables (set these in Render dashboard):
+# DB_HOST=dpg-d1sjc3re5dus73b3pre0-a.virginia-postgres.render.com
+# DB_PORT=5432
+# DB_NAME=sbt_bd
+# DB_USER=sebodetraca
+# DB_PASS=Ye4TSEiib3f5WWoUOJILs9gKKlclqu1g
+# APP_ENV=production
+
+# Port
+PORT=80
+# Health Check
+# /health_check.php
