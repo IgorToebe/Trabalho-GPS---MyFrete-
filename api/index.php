@@ -53,7 +53,21 @@ try {
             'message' => 'API Router está funcionando!',
             'method' => $method,
             'path' => $path,
-            'uri' => $requestUri
+            'uri' => $requestUri,
+            'data' => $data,
+            'queryParams' => $queryParams
+        ]);
+        exit;
+    }
+    
+    // Test frete update endpoint
+    if ($path === '/api/test-frete-update' && $method === 'POST') {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Test endpoint para debug de frete update',
+            'received_data' => $data,
+            'server_method' => $method,
+            'server_path' => $path
         ]);
         exit;
     }

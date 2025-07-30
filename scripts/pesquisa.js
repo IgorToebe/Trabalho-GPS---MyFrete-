@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Check if user is logged in
     const userData = localStorage.getItem('userData');
     if (!userData) {
@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const pesquisaForm = document.getElementById('pesquisaForm');
     const resultado = document.getElementById('resultadoPesquisa');
 
-    pesquisaForm.addEventListener('submit', async function(e) {
+    pesquisaForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
+
         const origem = document.getElementById('origem').value.trim();
         const destino = document.getElementById('destino').value.trim();
-        
+
         if (!origem || !destino) {
             alert('Por favor, preencha origem e destino.');
             return;
@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <p>Agora vamos buscar motoristas disponíveis...</p>
                 `;
-                
+
                 // Now fetch available drivers
                 await loadAvailableDrivers(result.data.id_frete);
-                
+
             } else {
                 resultado.style.display = 'block';
                 resultado.innerHTML = `<div style="color: red;">❌ Erro: ${result.error}</div>`;
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok && result.success) {
                 const drivers = result.data;
-                
+
                 if (drivers.length === 0) {
                     resultado.innerHTML += '<p>Nenhum motorista disponível no momento.</p>';
                     return;
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
                 });
-                
+
                 resultado.innerHTML += driversHtml;
             }
         } catch (error) {
@@ -104,8 +104,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Make selectDriver globally available
-    window.selectDriver = async function(driverId, freteId) {
+    window.selectDriver = async function (driverId, freteId) {
         try {
+            console.log(`Selecting driver ${driverId} for freight ${freteId}`);
+
             const response = await fetch(`/api/frete/${freteId}`, {
                 method: 'PUT',
                 headers: {
@@ -117,7 +119,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Non-JSON response received:', text);
+                alert('Erro: Resposta inválida do servidor. Verifique os logs.');
+                return;
+            }
+
             const result = await response.json();
+            console.log('Response data:', result);
 
             if (response.ok && result.success) {
                 alert('Motorista selecionado com sucesso!');
@@ -125,11 +140,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('currentFreteId', freteId);
                 window.location.href = 'tela_frete.html';
             } else {
-                alert('Erro ao selecionar motorista: ' + result.error);
+                alert('Erro ao selecionar motorista: ' + (result.error || 'Erro desconhecido'));
             }
         } catch (error) {
             console.error('Error selecting driver:', error);
-            alert('Erro de conexão ao selecionar motorista.');
+            alert('Erro de conexão ao selecionar motorista: ' + error.message);
         }
     };
 });
