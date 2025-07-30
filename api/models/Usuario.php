@@ -62,14 +62,21 @@ class Usuario extends BaseModel {
                     VALUES (:nomecompleto, :email, :telefone, :senha, :ehentregador) 
                     RETURNING id_usu";
             
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
+            $params = [
                 ':nomecompleto' => trim($data['nomecompleto']),
                 ':email' => trim($data['email']),
                 ':telefone' => trim($data['telefone']),
                 ':senha' => $hashedPassword,
                 ':ehentregador' => $ehentregador
-            ]);
+            ];
+            
+            // Debug logging
+            error_log("SQL Parameters: " . json_encode($params));
+            error_log("ehentregador value: " . var_export($ehentregador, true));
+            error_log("ehentregador type: " . gettype($ehentregador));
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
             
             $result = $stmt->fetch();
             return $this->successResponse(['id_usu' => $result['id_usu']], "Usuário criado com sucesso");
