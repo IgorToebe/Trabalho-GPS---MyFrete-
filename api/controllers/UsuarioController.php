@@ -9,6 +9,8 @@ class UsuarioController {
     }
     
     public function handleRequest($method, $path, $data) {
+        error_log("UsuarioController - Method: $method, Path: $path");
+        
         switch ($method) {
             case 'POST':
                 if ($path === '/api/login_usuarios') {
@@ -27,8 +29,9 @@ class UsuarioController {
                 break;
         }
         
+        error_log("UsuarioController - Endpoint not found: $path");
         http_response_code(404);
-        echo json_encode(['error' => 'Endpoint não encontrado']);
+        echo json_encode(['error' => 'Endpoint não encontrado', 'path' => $path, 'method' => $method]);
     }
     
     private function create($data) {

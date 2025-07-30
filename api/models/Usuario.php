@@ -122,12 +122,15 @@ class Usuario extends BaseModel {
     }
     
     public function getEntregadores() {
+        error_log("Usuario->getEntregadores() - Mock mode: " . ($this->mockMode ? 'true' : 'false'));
+        
         if ($this->mockMode) {
             $entregadores = array_values(MockDatabase::getEntregadores());
             // Remove passwords
             foreach ($entregadores as &$user) {
                 unset($user['senha']);
             }
+            error_log("Found " . count($entregadores) . " entregadores in mock mode");
             return $this->successResponse($entregadores);
         }
         
@@ -139,10 +142,12 @@ class Usuario extends BaseModel {
             $stmt->execute();
             
             $entregadores = $stmt->fetchAll();
+            error_log("Found " . count($entregadores) . " entregadores in database");
             
             return $this->successResponse($entregadores);
             
         } catch (PDOException $e) {
+            error_log("Database error in getEntregadores: " . $e->getMessage());
             $this->errorResponse("Erro ao buscar entregadores: " . $e->getMessage(), 500);
         }
     }

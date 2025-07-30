@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     // Check if user is logged in
     const userData = localStorage.getItem('userData');
     if (!userData) {
@@ -7,10 +7,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     const user = JSON.parse(userData);
-    
+
     // Try to get current freight ID or find user's active freight
     let currentFreteId = localStorage.getItem('currentFreteId');
-    
+    let statusTimer = null;
+    let currentStatusIndex = 0;
+    const statusKeys = ['pendente', 'aceito', 'em andamento', 'concluido'];
+
     if (!currentFreteId) {
         // If no specific freight ID, try to find user's active freight
         await findActiveFreight(user.id_usu);
@@ -18,11 +21,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadFreightDetails(currentFreteId);
     }
 
-    document.getElementById('btnChat').addEventListener('click', function() {
+    document.getElementById('btnChat').addEventListener('click', function () {
         window.location.href = 'tela_chat.html';
     });
-    
-    document.getElementById('btnFinalizar').addEventListener('click', async function() {
+
+    document.getElementById('btnFinalizar').addEventListener('click', async function () {
         if (currentFreteId) {
             await finalizeFreight(currentFreteId);
         } else {
@@ -37,10 +40,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             if (response.ok && result.success && result.data.length > 0) {
                 // Find the most recent active freight
-                const activeFreights = result.data.filter(f => 
+                const activeFreights = result.data.filter(f =>
                     f.status !== 'concluido' && f.status !== 'cancelado'
                 );
-                
+
                 if (activeFreights.length > 0) {
                     currentFreteId = activeFreights[0].id_frete;
                     localStorage.setItem('currentFreteId', currentFreteId);
@@ -64,34 +67,85 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             if (response.ok && result.success) {
                 const frete = result.data;
-                
+
                 document.getElementById('origem').textContent = frete.end_origem;
                 document.getElementById('destino').textContent = frete.end_destino;
-                document.getElementById('motorista').textContent = 
+                document.getElementById('motorista').textContent =
                     frete.fretista_nome || 'Aguardando motorista...';
-                document.getElementById('status').textContent = getStatusDisplay(frete.status);
-                
-                // Update finalize button based on status
-                const btnFinalizar = document.getElementById('btnFinalizar');
-                if (frete.status === 'concluido') {
-                    btnFinalizar.textContent = 'Avaliar Motorista';
-                    btnFinalizar.onclick = () => {
-                        localStorage.setItem('freteParaAvaliacao', freteId);
-                        window.location.href = 'tela_avaliacao.html';
-                    };
-                } else if (frete.status === 'em andamento') {
-                    btnFinalizar.textContent = 'Finalizar Frete';
-                } else {
-                    btnFinalizar.textContent = 'Aguardando...';
-                    btnFinalizar.disabled = true;
-                }
-                
+
+                // Start status cycling
+                startStatusCycling(frete.status);
+
             } else {
                 showNoActiveFreight();
             }
         } catch (error) {
             console.error('Error loading freight details:', error);
             showNoActiveFreight();
+        }
+    }
+
+    function startStatusCycling(initialStatus) {
+        // Find the starting index based on current status
+        currentStatusIndex = statusKeys.findIndex(status => status === initialStatus);
+        if (currentStatusIndex === -1) currentStatusIndex = 0;
+
+        // Update status display immediately
+        updateStatusDisplay(statusKeys[currentStatusIndex]);
+
+        // Clear any existing timer
+        if (statusTimer) {
+            clearInterval(statusTimer);
+        }
+
+        // Start cycling through statuses every 5 seconds
+        statusTimer = setInterval(() => {
+            currentStatusIndex = (currentStatusIndex + 1) % statusKeys.length;
+            const newStatus = statusKeys[currentStatusIndex];
+            updateStatusDisplay(newStatus);
+            updateButtonForStatus(newStatus);
+        }, 5000);
+    }
+
+    function updateStatusDisplay(status) {
+        const statusElement = document.getElementById('status');
+        const displayText = getStatusDisplay(status);
+        statusElement.textContent = displayText;
+    }
+
+    function updateButtonForStatus(status) {
+        const btnFinalizar = document.getElementById('btnFinalizar');
+
+        switch (status) {
+            case 'pendente':
+                btnFinalizar.textContent = 'Aguardando motorista...';
+                btnFinalizar.disabled = true;
+                btnFinalizar.style.backgroundColor = '#ccc';
+                break;
+            case 'aceito':
+                btnFinalizar.textContent = 'Aguardando retirada...';
+                btnFinalizar.disabled = true;
+                btnFinalizar.style.backgroundColor = '#ffa500';
+                break;
+            case 'em andamento':
+                btnFinalizar.textContent = 'Finalizar Frete';
+                btnFinalizar.disabled = false;
+                btnFinalizar.style.backgroundColor = '#28a745';
+                btnFinalizar.onclick = () => finalizeFreight(currentFreteId);
+                break;
+            case 'concluido':
+                btnFinalizar.textContent = 'Avaliar Motorista';
+                btnFinalizar.disabled = false;
+                btnFinalizar.style.backgroundColor = '#007bff';
+                btnFinalizar.onclick = () => {
+                    localStorage.setItem('freteParaAvaliacao', currentFreteId);
+                    window.location.href = 'tela_avaliacao.html';
+                };
+                break;
+            default:
+                btnFinalizar.textContent = 'Aguardando...';
+                btnFinalizar.disabled = true;
+                btnFinalizar.style.backgroundColor = '#ccc';
         }
     }
 
@@ -123,13 +177,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     function showNoActiveFreight() {
+        // Clear status timer if running
+        if (statusTimer) {
+            clearInterval(statusTimer);
+            statusTimer = null;
+        }
+
         document.getElementById('origem').textContent = 'Nenhum frete ativo';
         document.getElementById('destino').textContent = '-';
         document.getElementById('motorista').textContent = '-';
         document.getElementById('status').textContent = 'Sem frete ativo';
-        
+
         const btnFinalizar = document.getElementById('btnFinalizar');
         btnFinalizar.textContent = 'Criar Novo Frete';
+        btnFinalizar.disabled = false;
+        btnFinalizar.style.backgroundColor = '#28a745';
         btnFinalizar.onclick = () => window.location.href = 'tela_pesquisa.html';
     }
 
@@ -143,4 +205,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         };
         return statusMap[status] || status;
     }
+
+    // Clean up timer when leaving the page
+    window.addEventListener('beforeunload', function () {
+        if (statusTimer) {
+            clearInterval(statusTimer);
+        }
+    });
 });

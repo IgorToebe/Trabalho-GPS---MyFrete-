@@ -20,7 +20,17 @@ require_once __DIR__ . '/controllers/FreteAvaliacaoController.php';
 
 // Get request method and path
 $method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$requestUri = $_SERVER['REQUEST_URI'];
+$path = parse_url($requestUri, PHP_URL_PATH);
+
+// Remove query string for cleaner path
+$path = strtok($path, '?');
+
+// Normalize path - ensure it starts with /api/
+if (strpos($path, '/api/') !== 0) {
+    $path = '/api/' . ltrim($path, '/');
+}
+
 $queryParams = $_GET;
 
 // Get JSON data from request body
@@ -33,6 +43,21 @@ if (empty($data) && in_array($method, ['POST', 'PUT'])) {
 }
 
 try {
+    // Debug logging
+    error_log("API Request - Method: $method, Path: $path, URI: $requestUri");
+    
+    // Test endpoint
+    if ($path === '/api/test') {
+        echo json_encode([
+            'success' => true,
+            'message' => 'API Router está funcionando!',
+            'method' => $method,
+            'path' => $path,
+            'uri' => $requestUri
+        ]);
+        exit;
+    }
+    
     // Route to appropriate controller
     if (strpos($path, '/api/login_usuarios') === 0 || $path === '/api/login') {
         $controller = new UsuarioController();
@@ -47,11 +72,14 @@ try {
         $controller->handleRequest($method, $path, $data, $queryParams);
         
     } else {
+        error_log("API endpoint not found: $path");
         http_response_code(404);
-        echo json_encode(['error' => 'API endpoint não encontrado']);
+        echo json_encode(['error' => 'API endpoint não encontrado', 'path' => $path]);
     }
     
 } catch (Exception $e) {
+    error_log("API Error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     http_response_code(500);
     echo json_encode(['error' => 'Erro interno do servidor: ' . $e->getMessage()]);
 }

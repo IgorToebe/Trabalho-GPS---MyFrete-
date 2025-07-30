@@ -1,0 +1,26 @@
+# Override file for local development
+# This file is automatically loaded by Docker Compose
+version: '3.8'
+
+services:
+  myfrete-app:
+    environment:
+      - PHP_IDE_CONFIG=serverName=localhost
+    volumes:
+      # Mount source code for hot reload during development
+      - ./:/var/www/html:rw
+      # Mount logs for debugging
+      - ./logs:/var/log/apache2
+    # Enable PHP debugging
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    # Expose PostgreSQL port for external connections during development
+    ports:
+      - "5432:5432"
+    # Mount a local volume for database persistence
+    environment:
+      - POSTGRES_DB=myfrete
+      - POSTGRES_USER=postgres  
+      - POSTGRES_PASSWORD=postgres123

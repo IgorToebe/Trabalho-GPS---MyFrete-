@@ -34,15 +34,30 @@ class Database {
         if ($this->pdo === null) {
             try {
                 $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}";
-                $this->pdo = new PDO($dsn, $this->username, $this->password, [
+                
+                // Add connection timeout for Docker environments
+                $options = [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
-                ]);
+                    PDO::ATTR_TIMEOUT => 10, // 10 second timeout
+                ];
+                
+                $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
+                
+                // Test connection
+                $this->pdo->query('SELECT 1');
+                
             } catch (PDOException $e) {
+                error_log("Database connection failed: " . $e->getMessage());
+                error_log("DSN: pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}");
+                
                 // For development/demo purposes, fall back to mock database
-                require_once __DIR__ . '/mock_database.php';
-                throw new Exception("Database connection failed (using mock data for demo): " . $e->getMessage());
+                if (file_exists(__DIR__ . '/mock_database.php')) {
+                    require_once __DIR__ . '/mock_database.php';
+                    error_log("Using mock database for demo purposes");
+                }
+                throw new Exception("Database connection failed: " . $e->getMessage());
             }
         }
         return $this->pdo;

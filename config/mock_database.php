@@ -7,24 +7,36 @@ class MockDatabase {
             'nomecompleto' => 'João Silva',
             'email' => 'joao@example.com',
             'telefone' => '11987654321',
-            'senha' => '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', // 12345
-            'ehentregador' => true
+            'senha' => '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', // senha123
+            'ehentregador' => true,
+            'created_at' => '2024-01-01 10:00:00'
         ],
         [
             'id_usu' => 2,
             'nomecompleto' => 'Maria Santos',
             'email' => 'maria@example.com',
             'telefone' => '11987654322',
-            'senha' => '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', // 12345
-            'ehentregador' => true
+            'senha' => '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', // senha123
+            'ehentregador' => true,
+            'created_at' => '2024-01-01 11:00:00'
         ],
         [
             'id_usu' => 3,
+            'nomecompleto' => 'Carlos Oliveira',
+            'email' => 'carlos@example.com',
+            'telefone' => '11987654323',
+            'senha' => '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', // senha123
+            'ehentregador' => true,
+            'created_at' => '2024-01-01 12:00:00'
+        ],
+        [
+            'id_usu' => 4,
             'nomecompleto' => 'Admin User',
             'email' => 'teste@myfrete.com',
             'telefone' => '11987654324',
-            'senha' => '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', // 12345
-            'ehentregador' => false
+            'senha' => '$2y$10$cRMDB6C3U4gb5mlvLNCySOIxgt4yzyyAWcGPKDs7.XIGfM5WuIVAe', // senha123
+            'ehentregador' => false,
+            'created_at' => '2024-01-01 13:00:00'
         ]
     ];
     
@@ -60,9 +72,12 @@ class MockDatabase {
     }
 
     public static function getEntregadores() {
-        return array_filter(self::$users, function($user) {
+        error_log("MockDatabase::getEntregadores() called");
+        $entregadores = array_filter(self::$users, function($user) {
             return $user['ehentregador'] === true;
         });
+        error_log("MockDatabase found " . count($entregadores) . " entregadores");
+        return $entregadores;
     }
 
     public static function addFrete($frete) {

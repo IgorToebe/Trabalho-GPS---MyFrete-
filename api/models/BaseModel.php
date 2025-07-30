@@ -11,8 +11,10 @@ class BaseModel {
         try {
             $this->pdo = $this->db->getConnection();
             $this->mockMode = false;
+            error_log("BaseModel: Database connection successful");
         } catch (Exception $e) {
             $this->mockMode = true;
+            error_log("BaseModel: Database connection failed, using mock mode. Error: " . $e->getMessage());
             require_once __DIR__ . '/../../config/mock_database.php';
         }
     }
